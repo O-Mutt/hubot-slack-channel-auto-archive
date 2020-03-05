@@ -1,0 +1,49 @@
+{
+  "name": "hubot-slack-channel-auto-archive",
+  "version": "1.1.8",
+  "description": "respond to hey janet messages",
+  "main": "index.js",
+  "scripts": {
+    "test": "$(npm bin)/mocha"
+  },
+  "author": "Matt Erickson (MutMatt) <Matt@MattErickson.me>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "hubot-test-helper": "^1.9.0",
+    "mocha": "^7.1.2"
+  },
+  "engines": {
+    "node": "12.16.1"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "hubot-scripts",
+    "hubot-respond",
+    "hubot",
+    "slack",
+    "irc",
+    "hipchat",
+    "campfire",
+    "bot",
+    "robot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mutmatt/hubot-janet.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "bugs": {
+    "url": "https://github.com/Mutmatt/hubot-janet/issues"
+  },
+  "homepage": "https://github.com/Mutmatt/hubot-janet#readme",
+  "dependencies": {
+    "@slack/client": "^5.0.2",
+    "cron": "^1.8.2",
+    "moment": "^2.29.1"
+  }
+}
