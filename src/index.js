@@ -42,7 +42,8 @@ module.exports = (robot) => {
           continue;
         }
         robot.logger.debug(`Trying to find history for ${channel.id} with the oldest message ${daysAgo} days ago`);
-        const { messages } = await web.conversations.history({ channel: channel.id, oldest: daysAgo })
+        const { messages } = await web.conversations.history({ channel: channel.id, oldest: daysAgo });
+        robot.logger.debug(`These are the messages[${messages.length}], ${JSON.stringify(messages[0])}`);
         const nonHubotMessages = messages.filter((message) => {
           robot.logger.debug('filter out the messages from hubot', message.user, robot);
           message.user !== robot.id;
