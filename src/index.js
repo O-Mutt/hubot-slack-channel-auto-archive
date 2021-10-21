@@ -36,7 +36,7 @@ module.exports = (robot) => {
 
       const channelsToArchive = [];
       const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').toISOString();
-      for (const channel in channels) {
+      for (const channel of channels) {
         if (!channel.id) {
           robot.logger.debug(`Missing channel id ${JSON.stringify(channel)}`);
           continue;
@@ -53,7 +53,7 @@ module.exports = (robot) => {
         }
       }
 
-      for (const readyToArchive in channelsToArchive) {
+      for (const readyToArchive of channelsToArchive) {
         robot.messageChannel(readyToArchive, 'This channel is inactive and will be exterminated :exterminate: tomorrow if no activity is recorded');
       }
     } catch (er) {
