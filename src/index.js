@@ -19,6 +19,7 @@
 
 const { CronJob } = require("cron");
 const helpers = require('./lib/helpers');
+const SlackClient = require('@slack/client');
 
 module.exports = (robot) => {
   const procVars = helpers.getProcessVariables(process.env);
