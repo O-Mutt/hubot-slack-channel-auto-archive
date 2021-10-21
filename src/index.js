@@ -37,9 +37,10 @@ module.exports = (robot) => {
       const channelsToArchive = [];
       const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').toISOString();
       for (const channel in channels) {
+        robot.logger.debug(`Trying to find history for ${channel.id} with the oldest message ${daysAgo} days ago`);
         const { messages } = await web.conversations.history({ channel: channel.id, oldest: daysAgo })
         const nonHubotMessages = messages.filter((message) => {
-          robot.logger.debug(' filter out the messages from hubot', message.user, robot);
+          robot.logger.debug('filter out the messages from hubot', message.user, robot);
           message.user !== robot.id;
         })
         if (nonHubotMessages.length <= 0) {
