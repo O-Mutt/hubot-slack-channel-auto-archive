@@ -20,6 +20,7 @@
 const { CronJob } = require("cron");
 const helpers = require('./lib/helpers');
 const SlackClient = require('@slack/client');
+const moment = require('moment');
 
 module.exports = (robot) => {
   const procVars = helpers.getProcessVariables(process.env);
@@ -31,7 +32,7 @@ module.exports = (robot) => {
       robot.logger.debug("cron triggered");
       const web = new SlackClient.WebClient(robot.adapter.options.token);
       const { channels } = await web.conversations.list();
-      robot.logger.debug("Found these channels", channels.join(' '));
+      robot.logger.debug("Found these channels", JSON.stringify(channels));
 
       const channelsToArchive = [];
       const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').toISOString();
