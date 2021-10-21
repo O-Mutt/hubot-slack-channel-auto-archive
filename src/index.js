@@ -54,7 +54,7 @@ module.exports = (robot) => {
       }
 
       for (const readyToArchive of channelsToArchive) {
-        robot.messageChannel(readyToArchive, 'This channel is inactive and will be exterminated :exterminate: tomorrow if no activity is recorded');
+        robot.messageRoom(readyToArchive, 'This channel is inactive and will be exterminated :exterminate: tomorrow if no activity is recorded');
       }
     } catch (er) {
       robot.logger.debug(`An error occurred in the cron ${er.message}`);
