@@ -54,8 +54,15 @@ module.exports = (robot) => {
         }
       }
 
+
+
       for (const readyToArchive of channelsToArchive) {
-        robot.messageRoom(readyToArchive, 'This channel is inactive and will be exterminated :exterminate: tomorrow if no activity is recorded');
+        try {
+          await web.conversations.join({ channel: readyToArchive });
+          robot.messageRoom(readyToArchive, 'This channel is inactive and will be exterminated :exterminate: tomorrow if no activity is recorded');
+        } catch (e) {
+          robot.logger.error(`Couldn't join channel #${readyToArchive} ${e.message}`);
+        }
       }
     } catch (er) {
       robot.logger.debug(`An error occurred in the cron ${er.message}`);
