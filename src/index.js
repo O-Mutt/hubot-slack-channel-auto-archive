@@ -35,7 +35,7 @@ module.exports = (robot) => {
       robot.logger.debug("Found these channels", JSON.stringify(channels));
 
       const channelsToArchive = [];
-      const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').toISOString();
+      const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').unix();
       for (const channel of channels) {
         if (!channel.id) {
           robot.logger.debug(`Missing channel id ${JSON.stringify(channel)}`);
