@@ -29,13 +29,13 @@ module.exports = (robot) => {
   robot.logger.debug(`register the channel cleanup cron days since ${daysSinceLastInteraction} cron ${autoArchiveDays}`);
   const job = new CronJob(autoArchiveDays, async () => {
     try {
-      robot.logger.debug("cron triggered");
+      robot.logger.debug(`cron triggered for robot ${robot}`);
       const web = new SlackClient.WebClient(robot.adapter.options.token);
       const { channels } = await web.conversations.list();
-      robot.logger.debug("Found these channels", JSON.stringify(channels));
+      robot.logger.debug("Found these channels", channels.map((channel) => channel.id).join(', '));
 
       const channelsToArchive = [];
-      const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').valueOf();
+      const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').unix();
       for (const channel of channels) {
         if (!channel.id) {
           robot.logger.debug(`Missing channel id ${JSON.stringify(channel)}`);
@@ -43,9 +43,9 @@ module.exports = (robot) => {
         }
         robot.logger.debug(`Trying to find history for ${channel.id} with the oldest message ${daysAgo} days ago`);
         const { messages } = await web.conversations.history({ channel: channel.id, oldest: daysAgo });
-        robot.logger.debug(`These are the messages[${messages.length}], ${JSON.stringify(messages[0])}`);
+        robot.logger.debug(`Got the history for ${channel.name} there are ${messages.length} messages since ${moment(daysAgo).format('MM/DD/YYYY')}, E.G:\n ${JSON.stringify(messages[0])}`);
         const nonHubotMessages = messages.filter((message) => {
-          robot.logger.debug('filter out the messages from hubot', message.user, robot);
+          robot.logger.debug(`Filter out the messages from hubot ${message.user}, ${message.text}`);
           message.user !== robot.id;
         })
         if (nonHubotMessages.length <= 0) {
