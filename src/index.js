@@ -68,9 +68,13 @@ module.exports = (robot) => {
       for (const warnTheChannel of channelsToWarn) {
         try {
           await web.conversations.join({ channel: warnTheChannel });
-          robot.messageRoom(warnTheChannel, warningMessage);
         } catch (e) {
           robot.logger.error(`Couldn't join channel #${warnTheChannel} ${e.message}`);
+        }
+        try { 
+          robot.messageRoom(warnTheChannel, warningMessage);
+        } catch (e) {
+          robot.logger.error(`Couldn't message channel #${warnTheChannel} ${e.message}`);
         }
       }
 
