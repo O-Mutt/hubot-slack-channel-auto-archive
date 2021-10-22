@@ -24,8 +24,11 @@ const moment = require('moment');
 
 module.exports = (robot) => {
   const procVars = helpers.getProcessVariables(process.env);
+  const warningMessage = 'This channel is inactive and will be exterminated :exterminate: shortly if no activity is recorded';
 
   const { daysSinceLastInteraction, autoArchiveDays } = procVars;
+  const daysAgoNumber = parseInt(daysSinceLastInteraction, 10);
+  const warningDaysAgoNumber = daysAgoNumber - 3;
   robot.logger.debug(`register the channel cleanup cron days since ${daysSinceLastInteraction} cron ${autoArchiveDays}`);
   const job = new CronJob(autoArchiveDays, async () => {
     try {
@@ -35,6 +38,7 @@ module.exports = (robot) => {
       robot.logger.debug("Found these channels", channels.map((channel) => channel.id).join(', '));
 
       const channelsToArchive = [];
+      const channelsToWarn = [];
       const daysAgo = moment().subtract(daysSinceLastInteraction, 'days').unix();
       for (const channel of channels) {
         if (!channel.id) {
@@ -44,26 +48,42 @@ module.exports = (robot) => {
         robot.logger.debug(`Trying to find history for ${channel.id} with the oldest message ${daysAgo} days ago`);
         const { messages } = await web.conversations.history({ channel: channel.id, oldest: daysAgo });
         robot.logger.debug(`Got the history for ${channel.name} there are ${messages.length} messages since ${moment(daysAgo).format('MM/DD/YYYY')}, E.G:\n ${JSON.stringify(messages[0])}`);
+        const hubotWarningMessages = messages.filter((message) => {
+          robot.logger.debug(`Filter out the messages from hubot ${message.user}, ${message.text}`);
+          message.user === robot.id && message.text === warningMessage;
+        });
         const nonHubotMessages = messages.filter((message) => {
           robot.logger.debug(`Filter out the messages from hubot ${message.user}, ${message.text}`);
           message.user !== robot.id;
         })
-        if (nonHubotMessages.length <= 0) {
+        if (nonHubotMessages.length <= 0 && hubotWarningMessages > 4) {
           robot.logger.debug(`This channel has been found to have no user messages in the last ${daysSinceLastInteraction} days`);
           channelsToArchive.push(channel.id);
         }
-      }
-
-
-
-      for (const readyToArchive of channelsToArchive) {
-        try {
-          await web.conversations.join({ channel: readyToArchive });
-          robot.messageRoom(readyToArchive, 'This channel is inactive and will be exterminated :exterminate: tomorrow if no activity is recorded');
-        } catch (e) {
-          robot.logger.error(`Couldn't join channel #${readyToArchive} ${e.message}`);
+        if (nonHubotMessages.length <= 0) {
+          channelsToWarn.push(channel.id);
         }
       }
+
+
+
+      for (const warnTheChannel of channelsToWarn) {
+        try {
+          await web.conversations.join({ channel: warnTheChannel });
+          robot.messageRoom(warnTheChannel, warningMessage);
+        } catch (e) {
+          robot.logger.error(`Couldn't join channel #${warnTheChannel} ${e.message}`);
+        }
+      }
+
+      for (const channelToArchive of channelsToArchive) {
+        try {
+          await web.conversations.archive({ channel: channelToArchive });
+        } catch (e) {
+          robot.logger.error(`Couldn't archive channel #${channelToArchive} ${e.message}`);
+        }
+      }
+
     } catch (er) {
       robot.logger.debug(`An error occurred in the cron ${er.message}`);
     }
