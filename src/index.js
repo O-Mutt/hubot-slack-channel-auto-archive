@@ -27,8 +27,6 @@ module.exports = (robot) => {
   const warningMessage = 'This channel is inactive and will be exterminated :exterminate: shortly if no activity is recorded';
 
   const { daysSinceLastInteraction, autoArchiveDays } = procVars;
-  const daysAgoNumber = parseInt(daysSinceLastInteraction, 10);
-  const warningDaysAgoNumber = daysAgoNumber - 3;
   robot.logger.debug(`register the channel cleanup cron days since ${daysSinceLastInteraction} cron ${autoArchiveDays}`);
   const job = new CronJob(autoArchiveDays, async () => {
     try {
